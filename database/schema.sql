@@ -27,3 +27,40 @@ CREATE TABLE registrations (
 
     UNIQUE(participant_id, event_id)
 );
+
+┌─────────────────┐
+│   PARTICIPANTS  │
+│                 │
+│ participant_id  │
+│ first_name      │
+│ last_name       │
+│ email           │
+│ organization    │
+└────────┬────────┘
+         │
+         │ 1
+         │
+         │ many
+         ▼
+┌─────────────────┐
+│  REGISTRATIONS  │
+│                 │
+│ registration_id │
+│ participant_id  │
+│ event_id        │
+│ date            │
+│ status          │
+└────────┬────────┘
+         │
+         │ many
+         │
+         │ 1
+         ▼
+┌─────────────────┐
+│      EVENTS     │
+│                 │
+│ event_id        │
+│ name            │
+│ event_date      │
+│ location        │
+└─────────────────┘
