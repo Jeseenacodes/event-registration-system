@@ -1,1 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Event Registration</title>
 
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        input, select, button {
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        #message {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Event Registration</h1>
+
+    <p>Register for an upcoming nonprofit event.</p>
+
+    <form id="registrationForm">
+
+        <label for="event">Choose an event</label>
+
+        <select id="event" required>
+            <option value="">Loading events...</option>
+        </select>
+
+        <label for="firstName">First name</label>
+        <input
+            type="text"
+            id="firstName"
+            required
+        >
+
+        <label for="lastName">Last name</label>
+        <input
+            type="text"
+            id="lastName"
+            required
+        >
+
+        <label for="email">Email</label>
+        <input
+            type="email"
+            id="email"
+            required
+        >
+
+        <label for="organization">Organization</label>
+        <input
+            type="text"
+            id="organization"
+        >
+
+        <button type="submit">
+            Register
+        </button>
+
+    </form>
+
+    <div id="message"></div>
+
+
+    <script>
+
+        const API_URL = "http://127.0.0.1:8000";
+
+
+        // Load events from the API
+        async function loadEvents() {
+
+            const response = await fetch(
+                `${API_URL}/api/events`
+            );
+
+            const events = await response.json();
+
+            const eventSelect = document.getElementById("event");
+
+            eventSelect.innerHTML =
+                '<option value="">Select an event</option>';
+
+            events.forEach(event => {
+
+                const option = document.createElement("option");
+
+                option.value = event.event_id;
+
+                option.textContent =
+                    `${event.name} - ${event.event_date}`;
+
+                eventSelect.appendChild(option);
+
+            });
+        }
+
+
+        // Submit registration
+        document
+            .getElementById("registrationForm")
+            .addEventListener("submit", async function(event) {
+
+                event.preventDefault();
+
+                const registrationData = {
+
+                    first_name:
+                        document.getElementById("firstName").value,
+
+                    last_name:
+                        document.getElementById("lastName").value,
+
+                    email:
+                        document.getElementById("email").value,
+
+                    organization:
+                        document.getElementById("organization").value,
+
+                    event_id:
+                        Number(document.getElementById("event").value)
+                };
+
+
+                const response = await fetch(
+                    `${API_URL}/api/registrations`,
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        body: JSON.stringify(registrationData)
+                    }
+                );
+
+
+                const result = await response.json();
+
+                const message =
+                    document.getElementById("message");
+
+if (result.error) {
+
+    message.textContent =
+        result.error;
+
+} else {
+
+    message.textContent =
+        `Registration successful! Registration ID: ${result.registration_id}`;
+
+    document
+        .getElementById("registrationForm")
+        .reset();
+
+}
+            });
+
+
+        // Start by loading the events
+        loadEvents();
+
+    </script>
+
+</body>
+</html>
